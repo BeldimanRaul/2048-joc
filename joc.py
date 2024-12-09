@@ -113,3 +113,7 @@ def main(interfata):
 if __name__=="__main__":
     main(INTERFATA)
 
+
+def test():
+    pass
+
