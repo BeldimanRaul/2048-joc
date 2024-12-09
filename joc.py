@@ -44,7 +44,7 @@ class Patrat:
          self.y=rand*INALTIME_PAT
 
 
-     def get_culoare(self,inbterfata) :
+     def get_culoare(self,interfata) :
          index_culoare=int(math.log2(self.valoare))-1
          culoare=self.CULORI[index_culoare]
          return culoare
@@ -52,7 +52,7 @@ class Patrat:
 
 
      def desen(self,interfata):
-         culoare=self.get_culoare
+         culoare=self.get_culoare(interfata)
          pygame.draw.rect(interfata,culoare,(self.x,self.y,LUNGIME_PAT,INALTIME_PAT))
          text=FONT.render(str(self.valoare),1,CULOARE_FONT)
          interfata.blit(
@@ -87,7 +87,7 @@ def desen(interfata,patrate):
     interfata.fill(FUNDAL)
     
     for patrat in patrate.values():
-        patrat.desen()   
+        patrat.desen(interfata)   
    
     desen_p(interfata)
     pygame.display.update()
@@ -98,7 +98,7 @@ def main(interfata):
     ceas=pygame.time.Clock()
     run=True
 
-    patrate={"00":Patrat(4,0,0)}
+    patrate={"00":Patrat(4,0,0),"02":Patrat(128,1,1)}
 
     while run:
         ceas.tick(FPS)
@@ -107,7 +107,7 @@ def main(interfata):
             if eveniment.type==pygame.QUIT:
                 run=False  
                 break
-        desen(interfata)   
+        desen(interfata,patrate)   
     pygame.quit()        
 
 if __name__=="__main__":
