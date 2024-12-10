@@ -66,7 +66,10 @@ class Patrat:
      
 
      def miscari(self,delta) :
-         pass
+         self.x += delta [0]
+         self.y+= delta[1]
+
+
      def seteaza_pozitie():
          pass   
 
@@ -92,13 +95,79 @@ def desen(interfata,patrate):
     desen_p(interfata)
     pygame.display.update()
 
-#GAME LOOp
- #aici creem fereastra 
+
+def get_pozitie_random(patrate):
+    rand=None
+    coloana=None
+    while True:
+        rand=random.randrange(0,RANDURI)
+        coloana=random.randrange(0,COLOANE)
+        if f"{rand}{coloana}" not in patrate:
+            break
+    return rand,coloana
+
+
+def muta_patrate(interfata,patrate,ceas,directie):
+    updated=True
+    blocuri=set()
+
+    if directie =="stanga":
+        functie_sortare=lambda x: x.coloana
+        revers=False
+        delta=(-MISCARE,0)
+        boundary_check=lambda patrat: patrat.coloana==0
+        get_urmatoarea=lambda patrat: patrate.get(f"{patrat.rand}{patrat.coloana-1}")
+        merge_check=lambda patrat, urmatoru_patrat: patrat.x>urmatoru_patrat.x+MISCARE
+        move_check=lambda patrat , urmatoru_patrat: patrat.x > urmatoru_patrat.x+LUNGIME_PAT+MISCARE
+        tavan=True
+    elif directie=="dreapta":
+        pass
+    elif directie=="sus":
+        pass
+    elif directie=="jos":
+        pass
+
+    while updated:
+        ceas.tick(FPS)
+        updated=False
+        patrate_sortate=sorted(patrate.vaues(),key=functie_sortare,reverse=revers)
+
+        for i ,patrat in enumerate(patrate_sortate):
+            if boundary_check(patrat):
+                continue
+            urmatorul_patrat=get_urmatoarea(patrat)
+            if not urmatorul_patrat:
+                patrat.miscari(delta)
+            elif (patrat.valoare==urmatorul_patrat.valoare and patrat not in blocuri and urmatorul_patrat not in blocuri):
+                if merge_check(patrat,urmatorul_patrat):
+                    patrat.miscari(delta)
+                else:
+                    urmatorul_patrat.valoare*=2 
+                    patrate_sortate.pop(i) 
+                    blocuri.add(urmatorul_patrat)
+            elif move_check(patrat, urmatorul_patrat):
+                patrat.miscari(delta)
+            else:
+                continue   
+
+            updated=True 
+
+
+def genereaza_patrate():
+    patrate={}
+    for _ in range(2):
+        rand,coloana=get_pozitie_random(patrate)
+        patrate[f"{rand}{coloana}"]=Patrat(2,rand,coloana)
+
+    return patrate
+
+
+
 def main(interfata):
     ceas=pygame.time.Clock()
     run=True
 
-    patrate={"00":Patrat(4,0,0),"02":Patrat(128,1,1)}
+    patrate = genereaza_patrate()
 
     while run:
         ceas.tick(FPS)
@@ -112,8 +181,3 @@ def main(interfata):
 
 if __name__=="__main__":
     main(INTERFATA)
-
-
-def test():
-    pass
-
