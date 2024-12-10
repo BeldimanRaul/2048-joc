@@ -151,6 +151,7 @@ def muta_patrate(interfata,patrate,ceas,directie):
         get_urmatoarea = lambda patrat: patrate.get(f"{patrat.rand + 1}{patrat.coloana}")
         merge_check = lambda patrat, urmatoru_patrat: patrat.y < urmatoru_patrat.y - MISCARE
         move_check = lambda patrat, urmatoru_patrat: patrat.y + LUNGIME_PAT + MISCARE < urmatoru_patrat.y
+        tavan=False
 
     while updated:
         ceas.tick(FPS)
@@ -178,7 +179,7 @@ def muta_patrate(interfata,patrate,ceas,directie):
             patrat.seteaza_pozitie(tavan)
             updated=True
         update_patrate(interfata,patrate,patrate_sortate)
-    ultima_miscare=  (patrate)  
+    return ultima_miscare (patrate)  
 
 
 def ultima_miscare(patrate):
