@@ -70,8 +70,13 @@ class Patrat:
          self.y+= delta[1]
 
 
-     def seteaza_pozitie():
-         pass   
+     def seteaza_pozitie(self, tavan=False):
+         if tavan:
+             self.rand=math.ceil(self.y/INALTIME_PAT) 
+             self.coloana=math.ceil (self.x/LUNGIME_PAT)
+         else:
+             self.rand=math.floor(self.y/INALTIME_PAT)
+             self.coloana=math.floor(self.x/LUNGIME_PAT)    
 
 def desen_p(interfata):
     for rand in range(1,RANDURI):
@@ -117,20 +122,40 @@ def muta_patrate(interfata,patrate,ceas,directie):
         delta=(-MISCARE,0)
         boundary_check=lambda patrat: patrat.coloana==0
         get_urmatoarea=lambda patrat: patrate.get(f"{patrat.rand}{patrat.coloana-1}")
-        merge_check=lambda patrat, urmatoru_patrat: patrat.x>urmatoru_patrat.x+MISCARE
+        merge_check=lambda patrat, urmatoru_patrat: patrat.x<urmatoru_patrat.x+MISCARE
         move_check=lambda patrat , urmatoru_patrat: patrat.x > urmatoru_patrat.x+LUNGIME_PAT+MISCARE
         tavan=True
     elif directie=="dreapta":
-        pass
+        functie_sortare=lambda x: x.coloana
+        revers=True
+        delta=(MISCARE,0)
+        boundary_check=lambda patrat: patrat.coloana==COLOANE-1
+        get_urmatoarea=lambda patrat: patrate.get(f"{patrat.rand}{patrat.coloana+1}")
+        merge_check=lambda patrat, urmatoru_patrat: patrat.x>urmatoru_patrat.x-MISCARE
+        move_check=lambda patrat , urmatoru_patrat: patrat.x+LUNGIME_PAT+MISCARE < urmatoru_patrat.x
+        tavan=False
     elif directie=="sus":
-        pass
+        functie_sortare = lambda x: x.rand
+        revers = False
+        delta = (0, -MISCARE)
+        boundary_check = lambda patrat: patrat.rand == 0
+        get_urmatoarea = lambda patrat: patrate.get(f"{patrat.rand - 1}{patrat.coloana}")
+        merge_check = lambda patrat, urmatoru_patrat: patrat.y > urmatoru_patrat.y + MISCARE
+        move_check = lambda patrat, urmatoru_patrat: patrat.y > urmatoru_patrat.y + LUNGIME_PAT + MISCARE
+        tavan = True
     elif directie=="jos":
-        pass
+        functie_sortare = lambda x: x.rand
+        revers = True
+        delta = (0, MISCARE)
+        boundary_check = lambda patrat: patrat.rand == RANDURI - 1
+        get_urmatoarea = lambda patrat: patrate.get(f"{patrat.rand + 1}{patrat.coloana}")
+        merge_check = lambda patrat, urmatoru_patrat: patrat.y < urmatoru_patrat.y - MISCARE
+        move_check = lambda patrat, urmatoru_patrat: patrat.y + LUNGIME_PAT + MISCARE < urmatoru_patrat.y
 
     while updated:
         ceas.tick(FPS)
         updated=False
-        patrate_sortate=sorted(patrate.vaues(),key=functie_sortare,reverse=revers)
+        patrate_sortate=sorted(patrate.values(),key=functie_sortare,reverse=revers)
 
         for i ,patrat in enumerate(patrate_sortate):
             if boundary_check(patrat):
@@ -150,7 +175,31 @@ def muta_patrate(interfata,patrate,ceas,directie):
             else:
                 continue   
 
-            updated=True 
+            patrat.seteaza_pozitie(tavan)
+            updated=True
+        update_patrate(interfata,patrate,patrate_sortate)
+    ultima_miscare=  (patrate)  
+
+
+def ultima_miscare(patrate):
+    if len(patrate)==16:
+        return"ai pierdut"
+    
+    rand, coloana=get_pozitie_random(patrate)
+    patrate[f"{rand}{coloana}"]=Patrat(random.choice([2,4]),rand, coloana)
+    return "continua"
+    
+
+
+
+
+def update_patrate(interfata, patrate,patrate_sortate):
+    patrate.clear()
+    for patrat in patrate_sortate:
+        patrate[f"{patrat.rand}{patrat.coloana}"]=patrat
+    desen(interfata,patrate)    
+
+            
 
 
 def genereaza_patrate():
@@ -176,6 +225,16 @@ def main(interfata):
             if eveniment.type==pygame.QUIT:
                 run=False  
                 break
+            if eveniment.type==pygame.KEYDOWN:
+                if eveniment.key==pygame.K_LEFT:
+                    muta_patrate(interfata,patrate,ceas,"stanga")
+                if eveniment.key==pygame.K_RIGHT:
+                    muta_patrate(interfata,patrate,ceas,"dreapta")
+                if eveniment.key==pygame.K_UP:
+                    muta_patrate(interfata,patrate,ceas,"sus")
+                if eveniment.key==pygame.K_DOWN:
+                    muta_patrate(interfata,patrate,ceas,"jos")
+
         desen(interfata,patrate)   
     pygame.quit()        
 
